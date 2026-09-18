@@ -107,13 +107,24 @@ class MemoryService:
 
     def view_memory(self, story_id: int) -> MemoryView:
         rolling = self.dynamic_store.latest_rolling_summary(story_id)
+        chapters_by_id = {
+            chapter.id: chapter
+            for chapter in self.dynamic_store.all_chapters(story_id)
+        }
+        summaries = []
+        for item in self.dynamic_store.chapter_summaries(story_id, limit=100):
+            chapter = chapters_by_id.get(item.chapter_id)
+            summaries.append(
+                {
+                    "chapter_id": item.chapter_id,
+                    "chapter_index": chapter.chapter_index if chapter else item.chapter_id,
+                    "summary": item.summary,
+                }
+            )
         return MemoryView(
             latest_states=[item.model_dump() for item in self.dynamic_store.latest_states(story_id)],
             state_history=[item.model_dump() for item in self.dynamic_store.recent_history(story_id, limit=100)],
-            chapter_summaries=[
-                {"chapter_id": item.chapter_id, "summary": item.summary}
-                for item in self.dynamic_store.chapter_summaries(story_id, limit=100)
-            ],
+            chapter_summaries=summaries,
             rolling_summary=rolling.summary if rolling else "",
         )
 
@@ -127,4 +138,3 @@ class MemoryService:
             note=request.note,
         )
         return self.view_memory(story_id)
-

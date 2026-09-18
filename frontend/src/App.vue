@@ -262,7 +262,7 @@ function nextChapter() {
           <h3>章节摘要</h3>
           <ul>
             <li v-for="item in memory.chapter_summaries" :key="item.chapter_id">
-              第 {{ item.chapter_id }} 章：{{ item.summary }}
+              第 {{ item.chapter_index || item.chapter_id }} 章：{{ item.summary }}
             </li>
           </ul>
         </section>

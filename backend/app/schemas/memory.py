@@ -43,6 +43,7 @@ class StateHistoryView(BaseModel):
 
 class ChapterSummaryView(BaseModel):
     chapter_id: int
+    chapter_index: int
     summary: str
 
 
@@ -59,4 +60,3 @@ class StateCorrectionRequest(BaseModel):
     state_type: str
     state_value: str
     note: str = "用户手动修正"
-
