@@ -39,6 +39,15 @@ Run the backend:
 uvicorn app.main:app --reload
 ```
 
+Run a local smoke check:
+
+```powershell
+cd backend
+.\.venv\Scripts\python scripts\smoke_check.py
+```
+
+The smoke check imports FastAPI, initializes SQLite tables, verifies the DeepSeek missing-key guard, and calls local Ollama `bge-m3` embeddings. It never prints API keys.
+
 Run the frontend once npm is available on PATH:
 
 ```powershell
@@ -56,4 +65,3 @@ npm run dev
 5. Confirm chapter
 6. Memory is extracted and saved immediately
 7. Review or correct memory, then continue the next chapter
-
