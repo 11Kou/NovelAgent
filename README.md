@@ -17,11 +17,10 @@ Chapter content is stored for reading and export only. It is never embedded. Onl
 
 Copy `.env.example` to `.env` and fill `DEEPSEEK_API_KEY`.
 
-Start Ollama and make sure the embedding model exists:
+If your local Ollama model is named `bge-m3:latest`, set this in `.env`:
 
 ```powershell
-ollama pull bge-m3
-ollama serve
+OLLAMA_EMBEDDING_MODEL=bge-m3:latest
 ```
 
 Install backend dependencies:
@@ -33,10 +32,25 @@ python -m venv .venv
 python -m pip install -r requirements.txt
 ```
 
+Start Ollama and make sure the embedding model exists. If the `ollama` command is on PATH:
+
+```powershell
+ollama pull bge-m3
+ollama serve
+```
+
+If the `ollama` command is not on PATH, start the Ollama desktop app. Then verify models through the backend script:
+
+```powershell
+cd backend
+.\.venv\Scripts\python scripts\check_ollama.py
+```
+
 Run the backend:
 
 ```powershell
-uvicorn app.main:app --reload
+$env:PYTHONPATH = "."
+.\.venv\Scripts\python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
 ```
 
 Run a local smoke check:
@@ -57,12 +71,37 @@ cd backend
 
 The API smoke uses FastAPI's in-process test client to run settings drafting, story creation, chapter event drafting, chapter drafting, chapter confirmation, memory extraction, and LangGraph trace checks.
 
-Run the frontend once npm is available on PATH:
+Run the frontend:
 
 ```powershell
 cd frontend
-npm install
-npm run dev
+pnpm install
+pnpm dev --host 127.0.0.1 --port 5173
+```
+
+Open `http://127.0.0.1:5173/`.
+
+## Local Verification
+
+Use these checks before a demo:
+
+```powershell
+$env:PYTHONPATH = "backend"
+backend\.venv\Scripts\python -m pytest backend\tests -q
+backend\.venv\Scripts\python -m compileall backend\app backend\tests backend\scripts
+```
+
+```powershell
+cd frontend
+pnpm build
+```
+
+Optional real model smoke test, after FastAPI dependencies and `.env` are ready:
+
+```powershell
+cd backend
+.\.venv\Scripts\python scripts\smoke_check.py
+.\.venv\Scripts\python scripts\api_smoke.py
 ```
 
 ## MVP Flow
