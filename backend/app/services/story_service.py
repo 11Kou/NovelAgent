@@ -24,12 +24,20 @@ from app.workflows.graph_runner import StoryGraphRunner
 
 
 class StoryService:
-    def __init__(self, session: Session, settings: Settings):
+    def __init__(
+        self,
+        session: Session,
+        settings: Settings,
+        *,
+        llm_client: LLMClient | None = None,
+        embedding_client: EmbeddingClient | None = None,
+        vector_store: VectorStore | None = None,
+    ):
         self.session = session
         self.settings = settings
-        llm = LLMClient(settings)
-        embedding = EmbeddingClient(settings)
-        vector_store = VectorStore(settings)
+        llm = llm_client or LLMClient(settings)
+        embedding = embedding_client or EmbeddingClient(settings)
+        vector_store = vector_store or VectorStore(settings)
         self.planning_agent = PlanningAgent(llm)
         self.writing_agent = WritingAgent(llm)
         self.memory_agent = MemoryAgent(llm)
