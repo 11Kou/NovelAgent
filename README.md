@@ -86,6 +86,18 @@ Open `http://127.0.0.1:5173/`.
 Use these checks before a demo:
 
 ```powershell
+.\scripts\demo_check.ps1
+```
+
+This runs the Ollama model check, backend tests, backend compilation, and frontend build. To also run the real DeepSeek API smoke, use:
+
+```powershell
+.\scripts\demo_check.ps1 -RunApiSmoke
+```
+
+The same checks can also be run manually:
+
+```powershell
 $env:PYTHONPATH = "backend"
 backend\.venv\Scripts\python -m pytest backend\tests -q
 backend\.venv\Scripts\python -m compileall backend\app backend\tests backend\scripts
