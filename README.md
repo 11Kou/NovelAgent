@@ -48,6 +48,15 @@ cd backend
 
 The smoke check imports FastAPI, initializes SQLite tables, verifies the DeepSeek missing-key guard, and calls local Ollama `bge-m3` embeddings. It never prints API keys.
 
+Run the real API smoke after `.env` has `DEEPSEEK_API_KEY`:
+
+```powershell
+cd backend
+.\.venv\Scripts\python scripts\api_smoke.py
+```
+
+The API smoke uses FastAPI's in-process test client to run settings drafting, story creation, chapter event drafting, chapter drafting, chapter confirmation, memory extraction, and LangGraph trace checks.
+
 Run the frontend once npm is available on PATH:
 
 ```powershell
