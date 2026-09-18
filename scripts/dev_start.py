@@ -19,8 +19,13 @@ def main() -> int:
     backend_python = resolve_backend_python()
     pnpm = resolve_pnpm()
 
-    env = os.environ.copy()
-    env["PYTHONPATH"] = "."
+    root_env = load_root_env()
+    backend_env = os.environ.copy()
+    backend_env.update(root_env)
+    backend_env["PYTHONPATH"] = "."
+
+    frontend_env = os.environ.copy()
+    frontend_env.update({key: value for key, value in root_env.items() if key.startswith("VITE_")})
 
     backend_cmd = [
         str(backend_python),
@@ -50,8 +55,8 @@ def main() -> int:
     print("[dev] Press Ctrl+C to stop both processes.", flush=True)
 
     processes = [
-        subprocess.Popen(backend_cmd, cwd=BACKEND_DIR, env=env),
-        subprocess.Popen(frontend_cmd, cwd=FRONTEND_DIR),
+        subprocess.Popen(backend_cmd, cwd=BACKEND_DIR, env=backend_env),
+        subprocess.Popen(frontend_cmd, cwd=FRONTEND_DIR, env=frontend_env),
     ]
 
     try:
@@ -91,6 +96,21 @@ def resolve_pnpm() -> str:
     if pnpm:
         return pnpm
     raise SystemExit("pnpm was not found on PATH. Install pnpm, then run this script again.")
+
+
+def load_root_env() -> dict[str, str]:
+    env_path = ROOT / ".env"
+    if not env_path.exists():
+        return {}
+
+    values: dict[str, str] = {}
+    for line in env_path.read_text(encoding="utf-8").splitlines():
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#") or "=" not in stripped:
+            continue
+        key, value = stripped.split("=", 1)
+        values[key.strip()] = value.strip().strip('"').strip("'")
+    return values
 
 
 def wait_for_processes(processes: list[subprocess.Popen]) -> int:

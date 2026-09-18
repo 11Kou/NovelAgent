@@ -23,6 +23,16 @@ If your local Ollama model is named `bge-m3:latest`, set this in `.env`:
 OLLAMA_EMBEDDING_MODEL=bge-m3:latest
 ```
 
+For slower model responses, keep backend and frontend timeouts aligned:
+
+```powershell
+MODEL_TIMEOUT_SECONDS=120
+MODEL_MAX_RETRIES=1
+VITE_API_TIMEOUT_MS=300000
+```
+
+When using `scripts\dev_start.py`, backend values are passed to FastAPI and only `VITE_` values are passed to the frontend.
+
 Install backend dependencies:
 
 ```powershell

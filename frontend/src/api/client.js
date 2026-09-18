@@ -1,5 +1,5 @@
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://127.0.0.1:8000'
-const DEFAULT_TIMEOUT_MS = 90000
+const DEFAULT_TIMEOUT_MS = readTimeoutMs()
 
 async function request(path, options = {}) {
   const { timeoutMs, ...fetchOptions } = options
@@ -53,6 +53,11 @@ function formatErrorMessage(status, data, text) {
     return `请求失败：${status}，${text.slice(0, 300)}`
   }
   return `请求失败：${status}`
+}
+
+function readTimeoutMs() {
+  const value = Number(import.meta.env.VITE_API_TIMEOUT_MS || 300000)
+  return Number.isFinite(value) && value > 0 ? value : 300000
 }
 
 export const api = {

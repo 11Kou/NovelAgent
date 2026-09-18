@@ -25,8 +25,8 @@ class Settings(BaseSettings):
 
     database_url: str = "sqlite:///data/story.db"
     chroma_path: str = "data/chroma"
-    model_timeout_seconds: int = Field(default=45, ge=5)
-    model_max_retries: int = Field(default=2, ge=0, le=5)
+    model_timeout_seconds: int = Field(default=120, ge=5)
+    model_max_retries: int = Field(default=1, ge=0, le=5)
     recent_chapter_window: int = Field(default=3, ge=1)
     rolling_summary_interval: int = Field(default=5, ge=1)
     prompt_token_budget: int = Field(default=7000, ge=1000)
