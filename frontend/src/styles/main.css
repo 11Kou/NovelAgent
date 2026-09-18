@@ -187,11 +187,24 @@ h1 {
 }
 
 .error {
+  align-items: center;
   background: #fff1f2;
   border: 1px solid #fecdd3;
   border-radius: 8px;
   color: #be123c;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
   padding: 12px 14px;
+}
+
+.error p {
+  margin: 0;
+}
+
+.error button {
+  background: #be123c;
+  flex: 0 0 auto;
 }
 
 details {
@@ -267,5 +280,10 @@ li span {
   .steps,
   .memory-grid {
     grid-template-columns: 1fr;
+  }
+
+  .error {
+    align-items: stretch;
+    flex-direction: column;
   }
 }

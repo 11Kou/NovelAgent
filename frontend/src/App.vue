@@ -14,6 +14,7 @@ const steps = [
 const step = ref(0)
 const loading = ref(false)
 const error = ref('')
+const lastFailedAction = ref(null)
 const idea = ref('我想写一个未来城市里，失忆少女寻找自己身份的悬疑故事。')
 const storyId = ref(null)
 const settingsText = ref('')
@@ -48,10 +49,18 @@ async function run(action) {
   error.value = ''
   try {
     await action()
+    lastFailedAction.value = null
   } catch (err) {
     error.value = err.message || String(err)
+    lastFailedAction.value = action
   } finally {
     loading.value = false
+  }
+}
+
+function retryLastAction() {
+  if (lastFailedAction.value) {
+    return run(lastFailedAction.value)
   }
 }
 
@@ -176,7 +185,12 @@ function nextChapter() {
       </button>
     </nav>
 
-    <p v-if="error" class="error">{{ error }}</p>
+    <section v-if="error" class="error" role="alert">
+      <p>{{ error }}</p>
+      <button v-if="lastFailedAction" :disabled="loading" type="button" @click="retryLastAction">
+        {{ loading ? '重试中...' : '重试上一步' }}
+      </button>
+    </section>
 
     <section v-if="step === 0" class="panel">
       <label for="idea">故事想法</label>

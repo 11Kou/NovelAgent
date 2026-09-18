@@ -35,7 +35,9 @@ class LLMClient:
         max_tokens: int | None = None,
     ) -> str:
         if not self.settings.deepseek_api_key:
-            raise ModelClientError("DEEPSEEK_API_KEY is not configured.")
+            raise ModelClientError(
+                "DEEPSEEK_API_KEY is not configured. 请在项目根目录 .env 中配置 DeepSeek API Key。"
+            )
         return self._retry(lambda: self._chat(messages, temperature, max_tokens), "DeepSeek generation")
 
     def generate_json(
@@ -81,7 +83,12 @@ class LLMClient:
                 last_error = exc
                 if attempt < attempts:
                     time.sleep(min(2 ** (attempt - 1), 4))
-        raise ModelClientError(f"{label} failed after {attempts} attempt(s): {last_error}") from last_error
+        raise ModelClientError(
+            f"{label} failed after {attempts} attempt(s). "
+            f"请检查 DEEPSEEK_API_KEY、DEEPSEEK_BASE_URL={self.settings.deepseek_base_url} "
+            f"和 DEEPSEEK_MODEL={self.settings.deepseek_model}。"
+            f"原始错误：{_summarize_exception(last_error)}"
+        ) from last_error
 
     @staticmethod
     def _extract_json(text: str) -> Any:
@@ -125,8 +132,8 @@ class EmbeddingClient:
             embeddings = response.get("embeddings")
         if not embeddings:
             raise ModelClientError(
-                "Ollama returned no embeddings. Check Ollama is running and "
-                f"model '{self.settings.ollama_embedding_model}' is available."
+                "Ollama returned no embeddings. 请检查 Ollama 是否已启动，"
+                f"并确认 embedding 模型名 '{self.settings.ollama_embedding_model}' 可用。"
             )
         return [list(vector) for vector in embeddings]
 
@@ -141,7 +148,17 @@ class EmbeddingClient:
                 if attempt < attempts:
                     time.sleep(min(2 ** (attempt - 1), 4))
         raise ModelClientError(
-            f"{label} failed after {attempts} attempt(s). Check Ollama is running at "
-            f"{self.settings.ollama_host} and model '{self.settings.ollama_embedding_model}' exists: {last_error}"
+            f"{label} failed after {attempts} attempt(s). 请检查 Ollama 是否已启动 "
+            f"({self.settings.ollama_host})，并确认 embedding 模型名 "
+            f"'{self.settings.ollama_embedding_model}' 是否正确。"
+            f"原始错误：{_summarize_exception(last_error)}"
         ) from last_error
 
+
+def _summarize_exception(exc: Exception | None) -> str:
+    if exc is None:
+        return "未知错误"
+    message = str(exc).strip()
+    if not message:
+        message = exc.__class__.__name__
+    return message[:500]
