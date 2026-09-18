@@ -156,6 +156,36 @@ h1 {
   gap: 10px;
 }
 
+.workflow-trace {
+  border: 1px solid #d9e2ec;
+  border-radius: 8px;
+  padding: 14px;
+}
+
+.workflow-trace h3 {
+  font-size: 15px;
+  margin-bottom: 10px;
+}
+
+.workflow-trace ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.workflow-trace li {
+  background: #eef6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 999px;
+  color: #1e3a8a;
+  font-size: 13px;
+  margin: 0;
+  padding: 6px 10px;
+}
+
 .error {
   background: #fff1f2;
   border: 1px solid #fecdd3;
@@ -239,4 +269,3 @@ li span {
     grid-template-columns: 1fr;
   }
 }
-

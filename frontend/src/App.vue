@@ -21,6 +21,8 @@ const chapterEventText = ref('')
 const chapterContent = ref('')
 const assembledPrompt = ref('')
 const memory = ref(null)
+const generationTrace = ref([])
+const confirmationTrace = ref([])
 const userNote = ref('')
 const rewriteNote = ref('')
 const correction = ref({
@@ -93,6 +95,7 @@ function draftChapter() {
     })
     chapterContent.value = draft.content
     assembledPrompt.value = draft.assembled_prompt
+    generationTrace.value = draft.workflow_trace || []
     step.value = 3
   })
 }
@@ -109,6 +112,7 @@ function confirmChapter() {
       content: chapterContent.value
     })
     memory.value = await api.getMemory(storyId.value)
+    confirmationTrace.value = result.workflow_trace || []
     step.value = 5
     assembledPrompt.value = formatJson(result.memory)
   })
@@ -139,6 +143,8 @@ function nextChapter() {
   chapterEventText.value = ''
   chapterContent.value = ''
   assembledPrompt.value = ''
+  generationTrace.value = []
+  confirmationTrace.value = []
   step.value = 2
   return draftEvent()
 }
@@ -210,6 +216,12 @@ function nextChapter() {
         <summary>检索上下文预览</summary>
         <pre>{{ assembledPrompt }}</pre>
       </details>
+      <section v-if="generationTrace.length" class="workflow-trace">
+        <h3>LangGraph 章节生成流程</h3>
+        <ol>
+          <li v-for="node in generationTrace" :key="node">{{ node }}</li>
+        </ol>
+      </section>
       <div class="actions">
         <button :disabled="loading" @click="draftChapter">重写</button>
         <button :disabled="loading || !chapterContent.trim()" @click="goConfirmChapter">使用这一版</button>
@@ -230,6 +242,12 @@ function nextChapter() {
         <h2>当前记忆</h2>
         <button :disabled="loading" @click="refreshMemory">刷新</button>
       </div>
+      <section v-if="confirmationTrace.length" class="workflow-trace">
+        <h3>LangGraph 章节确认流程</h3>
+        <ol>
+          <li v-for="node in confirmationTrace" :key="node">{{ node }}</li>
+        </ol>
+      </section>
       <div v-if="memory" class="memory-grid">
         <section>
           <h3>最新状态</h3>
@@ -268,4 +286,3 @@ function nextChapter() {
     </section>
   </main>
 </template>
-
