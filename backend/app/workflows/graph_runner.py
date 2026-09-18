@@ -58,6 +58,7 @@ class StoryGraphRunner:
             chapter_event=request.chapter_event,
             assembled_prompt=state["assembled_prompt"],
             content=state["content"],
+            workflow_trace=state.get("workflow_trace", []),
         )
 
     def confirm_chapter(self, story_id: int, request: ChapterConfirmRequest) -> ChapterConfirmResponse:
@@ -77,4 +78,5 @@ class StoryGraphRunner:
             chapter_id=chapter.id,
             chapter_index=chapter.chapter_index,
             memory=state["memory"],
+            workflow_trace=state.get("workflow_trace", []),
         )

@@ -6,6 +6,12 @@ from app.workflows.workflow_state import ChapterConfirmationState
 def build_chapter_confirmation_graph(*, dynamic_store, memory_service):
     graph = StateGraph(ChapterConfirmationState)
 
+    def traced(state: ChapterConfirmationState, node_name: str, values: dict) -> dict:
+        return {
+            **values,
+            "workflow_trace": [*state.get("workflow_trace", []), node_name],
+        }
+
     def save_chapter(state: ChapterConfirmationState) -> dict:
         chapter_event = state["chapter_event"]
         chapter = dynamic_store.save_chapter(
@@ -15,7 +21,7 @@ def build_chapter_confirmation_graph(*, dynamic_store, memory_service):
             event_description=chapter_event.event_description,
             content=state["content"],
         )
-        return {"chapter": chapter}
+        return traced(state, "save_chapter", {"chapter": chapter})
 
     def extract_and_save_memory(state: ChapterConfirmationState) -> dict:
         chapter = state["chapter"]
@@ -26,7 +32,7 @@ def build_chapter_confirmation_graph(*, dynamic_store, memory_service):
             chapter_event=chapter.event_description,
             chapter_content=chapter.content,
         )
-        return {"memory": memory}
+        return traced(state, "extract_and_save_memory", {"memory": memory})
 
     graph.add_node("save_chapter", save_chapter)
     graph.add_node("extract_and_save_memory", extract_and_save_memory)
@@ -36,4 +42,3 @@ def build_chapter_confirmation_graph(*, dynamic_store, memory_service):
     graph.add_edge("extract_and_save_memory", END)
 
     return graph.compile()
-

@@ -90,6 +90,13 @@ def test_chapter_generation_graph_invokes_pipeline() -> None:
     assert "【强约束区】" in result["assembled_prompt"]
     assert "不要让主角无理由获得真相" in result["assembled_prompt"]
     assert result["content"].startswith("正文：更悬疑")
+    assert result["workflow_trace"] == [
+        "retrieve_static_context",
+        "retrieve_dynamic_context",
+        "retrieve_vector_context",
+        "assemble_prompt",
+        "write_chapter",
+    ]
 
 
 def test_chapter_confirmation_graph_saves_chapter_then_memory() -> None:
@@ -110,4 +117,4 @@ def test_chapter_confirmation_graph_saves_chapter_then_memory() -> None:
     assert result["chapter"].id == 7
     assert result["memory"].chapter_id == 7
     assert result["memory"].chapter_summary == "林夏发现旧标记。"
-
+    assert result["workflow_trace"] == ["save_chapter", "extract_and_save_memory"]

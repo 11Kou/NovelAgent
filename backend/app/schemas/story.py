@@ -76,6 +76,7 @@ class ChapterDraftResponse(BaseModel):
     chapter_event: ChapterEventDraft
     assembled_prompt: str
     content: str
+    workflow_trace: list[str] = Field(default_factory=list)
 
 
 class ChapterConfirmRequest(BaseModel):
@@ -87,9 +88,9 @@ class ChapterConfirmResponse(BaseModel):
     chapter_id: int
     chapter_index: int
     memory: "MemoryDraft"
+    workflow_trace: list[str] = Field(default_factory=list)
 
 
 from app.schemas.memory import MemoryDraft  # noqa: E402
 
 ChapterConfirmResponse.model_rebuild()
-

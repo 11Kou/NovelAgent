@@ -17,44 +17,70 @@ def build_chapter_generation_graph(
 ):
     graph = StateGraph(ChapterGenerationState)
 
+    def traced(state: ChapterGenerationState, node_name: str, values: dict) -> dict:
+        return {
+            **values,
+            "workflow_trace": [*state.get("workflow_trace", []), node_name],
+        }
+
     def retrieve_static_context(state: ChapterGenerationState) -> dict:
-        return {"static_context": static_retriever.retrieve(state["story_id"])}
+        return traced(
+            state,
+            "retrieve_static_context",
+            {"static_context": static_retriever.retrieve(state["story_id"])},
+        )
 
     def retrieve_dynamic_context(state: ChapterGenerationState) -> dict:
         chapter_event = state["chapter_event"]
         entity_ids = chapter_event.involved_entities
-        return {
-            "entity_ids": entity_ids,
-            "dynamic_context": dynamic_retriever.retrieve(state["story_id"], entity_ids),
-        }
+        return traced(
+            state,
+            "retrieve_dynamic_context",
+            {
+                "entity_ids": entity_ids,
+                "dynamic_context": dynamic_retriever.retrieve(state["story_id"], entity_ids),
+            },
+        )
 
     def retrieve_vector_context(state: ChapterGenerationState) -> dict:
         chapter_event = state["chapter_event"]
-        return {
-            "related_history": vector_retriever.retrieve(
-                story_id=state["story_id"],
-                query=chapter_event.event_description,
-                top_k=5,
-            )
-        }
+        return traced(
+            state,
+            "retrieve_vector_context",
+            {
+                "related_history": vector_retriever.retrieve(
+                    story_id=state["story_id"],
+                    query=chapter_event.event_description,
+                    top_k=5,
+                )
+            },
+        )
 
     def assemble_prompt(state: ChapterGenerationState) -> dict:
-        return {
-            "assembled_prompt": assembler.assemble(
-                static_context=state["static_context"],
-                dynamic_context=state["dynamic_context"],
-                related_history=state["related_history"],
-                chapter_event=state["chapter_event"],
-            )
-        }
+        return traced(
+            state,
+            "assemble_prompt",
+            {
+                "assembled_prompt": assembler.assemble(
+                    static_context=state["static_context"],
+                    dynamic_context=state["dynamic_context"],
+                    related_history=state["related_history"],
+                    chapter_event=state["chapter_event"],
+                )
+            },
+        )
 
     def write_chapter(state: ChapterGenerationState) -> dict:
-        return {
-            "content": writing_agent.write_chapter(
-                state["assembled_prompt"],
-                state.get("rewrite_note", ""),
-            )
-        }
+        return traced(
+            state,
+            "write_chapter",
+            {
+                "content": writing_agent.write_chapter(
+                    state["assembled_prompt"],
+                    state.get("rewrite_note", ""),
+                )
+            },
+        )
 
     graph.add_node("retrieve_static_context", retrieve_static_context)
     graph.add_node("retrieve_dynamic_context", retrieve_dynamic_context)
@@ -70,4 +96,3 @@ def build_chapter_generation_graph(
     graph.add_edge("write_chapter", END)
 
     return graph.compile()
-

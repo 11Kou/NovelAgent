@@ -15,6 +15,7 @@ class ChapterGenerationState(TypedDict, total=False):
     related_history: list[str]
     assembled_prompt: str
     content: str
+    workflow_trace: list[str]
 
 
 class ChapterConfirmationState(TypedDict, total=False):
@@ -23,4 +24,4 @@ class ChapterConfirmationState(TypedDict, total=False):
     content: str
     chapter: Chapter
     memory: MemoryDraft
-
+    workflow_trace: list[str]
