@@ -79,6 +79,12 @@ pnpm install
 pnpm dev --host 127.0.0.1 --port 5173
 ```
 
+Or start the backend and frontend together from the project root:
+
+```powershell
+backend\.venv\Scripts\python scripts\dev_start.py
+```
+
 Open `http://127.0.0.1:5173/`.
 
 ## Local Verification
