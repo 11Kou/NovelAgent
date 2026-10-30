@@ -61,6 +61,39 @@ function readTimeoutMs() {
 }
 
 export const api = {
+  listWorldbooks() {
+    return request('/api/library/worldbooks')
+  },
+  saveWorldbook(book, id = null) {
+    return request(`/api/library/worldbooks${id === null ? '' : `/${id}`}`, { method: id === null ? 'POST' : 'PUT', body: JSON.stringify(book) })
+  },
+  listCharacters() {
+    return request('/api/library/characters')
+  },
+  saveCharacter(card, id = null) {
+    return request(`/api/library/characters${id === null ? '' : `/${id}`}`, { method: id === null ? 'POST' : 'PUT', body: JSON.stringify(card) })
+  },
+  importCharacter(content, filename) {
+    return request('/api/characters/import', { method: 'POST', body: JSON.stringify({ content, filename }) })
+  },
+  updateGameSettings(id, payload) {
+    return request(`/api/games/${id}/settings`, { method: 'PUT', body: JSON.stringify(payload) })
+  },
+  importWorldbook(content, filename) {
+    return request('/api/worldbooks/import', { method: 'POST', body: JSON.stringify({ content, filename }) })
+  },
+  listGames() {
+    return request('/api/games')
+  },
+  getGame(id) {
+    return request(`/api/games/${id}`)
+  },
+  createGame(payload) {
+    return request('/api/games', { method: 'POST', body: JSON.stringify(payload) })
+  },
+  actInGame(id, payload) {
+    return request(`/api/games/${id}/actions`, { method: 'POST', body: JSON.stringify(payload) })
+  },
   draftSettings(idea) {
     return request('/api/stories/draft-settings', {
       method: 'POST',

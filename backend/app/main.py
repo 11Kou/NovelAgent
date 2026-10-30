@@ -5,8 +5,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.routes import router
+from app.api.game_routes import router as game_router
 from app.config.settings import get_settings
 from app.storage import models  # noqa: F401 - ensure SQLModel metadata is registered.
+from app.storage import game_models  # noqa: F401 - register game tables.
 from app.storage.db import create_db_and_tables
 
 
@@ -36,3 +38,4 @@ def health() -> dict[str, str]:
 
 
 app.include_router(router)
+app.include_router(game_router)
